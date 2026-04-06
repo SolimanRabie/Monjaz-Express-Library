@@ -1,8 +1,12 @@
 const express = require("express");
+
+const httpStatusText = require("./utils/httpStatusText");
+const cors = require("cors");
 // ********* connect on mongoose ************* //
+require("dotenv").config();
 const mongoose = require("mongoose");
-const url =
-  "mongodb://Soliman-Rabie:soliman0000@ac-pztdfip-shard-00-00.gpcvv5z.mongodb.net:27017,ac-pztdfip-shard-00-01.gpcvv5z.mongodb.net:27017,ac-pztdfip-shard-00-02.gpcvv5z.mongodb.net:27017/codezone?ssl=true&replicaSet=atlas-w7mf7y-shard-0&authSource=admin&appName=Cluster0";
+const url = process.env.MONGO_URL;
+console.log(process.env.MONGO_URL);
 main().catch((err) => console.log("henkish", err));
 
 async function main() {
@@ -11,10 +15,39 @@ async function main() {
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 // ********* connect on mongoose ************* //
+
 const app = express();
+app.use(express.json());
+app.use(cors());
 const coursesRoutes = require("./routes/courses-routes");
 app.use("/api/courses", coursesRoutes);
 
-app.listen(5001, "localhost", () => {
-  console.log("listening on port 5001 ");
+// ****** handel error *********//
+app.use((error, req, res, next) => {
+  res
+    .status(error.statusCode || 500)
+    .json({
+      status: error.statusText,
+      message: error.message,
+      code: error.statusText,
+      data: null,
+    });
 });
+// ****** handel error *********//
+
+// ********** in case of wrong url *********//
+// app.all("*", (req, res, next) => {
+//   return res.status(404).json({
+//     status: httpStatusText.ERROR,
+//     data: null,
+//     message: "this resource is not available",
+//   });
+// });
+// ********** in case of wrong url *********//
+
+app.listen(process.env.PORT, "localhost", () => {
+  console.log("listening on port:  ", process.env.PORT);
+});
+
+// githup commit :--> use jsend object and make pagination & make global error middlware
+//
