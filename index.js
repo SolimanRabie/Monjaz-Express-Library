@@ -20,20 +20,23 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 const coursesRoutes = require("./routes/courses-routes");
+const userRoutes = require("./routes/users-routes");
 app.use("/api/courses", coursesRoutes);
 
 // ****** handel error *********//
 app.use((error, req, res, next) => {
-  res
-    .status(error.statusCode || 500)
-    .json({
-      status: error.statusText,
-      message: error.message,
-      code: error.statusText,
-      data: null,
-    });
+  res.status(error.statusCode || 500).json({
+    status: error.statusText,
+    message: error.message,
+    code: error.statusText,
+    data: null,
+  });
 });
 // ****** handel error *********//
+
+// ****** user handeler *******//
+app.use("/api/users", userRoutes);
+// ****** user handeler *******//
 
 // ********** in case of wrong url *********//
 // app.all("*", (req, res, next) => {
@@ -49,5 +52,4 @@ app.listen(process.env.PORT, "localhost", () => {
   console.log("listening on port:  ", process.env.PORT);
 });
 
-// githup commit :--> use jsend object and make pagination & make global error middlware
-//
+// githup commit :--> make user model scima , with validator backage
