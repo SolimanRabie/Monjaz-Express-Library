@@ -12,7 +12,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
   console.log("headers", req.headers);
   const query = req.query;
   console.log("query ", query);
-  const limit = query.limit || 2;
+  const limit = query.limit || 5;
   const page = query.page || 1;
   const skip = (page - 1) * limit;
   const users = await User.find({}, { __v: false, password: false })
@@ -23,7 +23,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 
 const register = asyncWrapper(async (req, res, next) => {
   console.log(req.body);
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, role } = req.body;
 
   // ***** validation if exist ******//
   const oldUser = await User.findOne({ email: email });
@@ -47,9 +47,14 @@ const register = asyncWrapper(async (req, res, next) => {
     lastName,
     email,
     password: hashedPassword,
+    role,
   });
   // generate jwt token
-  const token = generateJWT({ email: newUser.email, id: newUser._id });
+  const token = await generateJWT({
+    email: newUser.email,
+    id: newUser._id,
+    role: newUser.role,
+  });
   newUser.token = token;
   // generate jwt token
   await newUser.save();
@@ -79,7 +84,11 @@ const login = asyncWrapper(async (req, res, next) => {
   const matchedPassword = await bcrypt.compare(password, user.password);
   console.log(user, matchedPassword);
   if (user && matchedPassword) {
-    const token = await generateJWT({ email: user.email, id: user._id });
+    const token = await generateJWT({
+      email: user.email,
+      id: user._id,
+      role: user.role,
+    });
 
     return res.json({
       status: httpStatusText.SUCCESS,
