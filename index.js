@@ -1,5 +1,5 @@
 const express = require("express");
-
+const path = require("node:path");
 const httpStatusText = require("./utils/httpStatusText");
 const cors = require("cors");
 // ********* connect on mongoose ************* //
@@ -33,7 +33,10 @@ app.use((error, req, res, next) => {
   });
 });
 // ****** handel error *********//
-
+//
+// ******** static folder handler *******//
+app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // join here for handel the diference between (/ => in windos - \ => in linux)
+// ******** static folder handler *******//
 // ****** user handeler *******//
 app.use("/api/users", userRoutes);
 // ****** user handeler *******//

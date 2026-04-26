@@ -48,6 +48,7 @@ const register = asyncWrapper(async (req, res, next) => {
     email,
     password: hashedPassword,
     role,
+    avatar: req.file.filename,
   });
   // generate jwt token
   const token = await generateJWT({
